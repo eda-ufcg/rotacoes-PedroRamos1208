@@ -67,6 +67,98 @@ public class BST {
     public boolean isEmpty() {
         return this.root == null;
     }
+
+     public void add(int element) {
+            this.root = insert(this.root, element);
+        }
+
+	private NodeAVL insert(NodeAVL node, int element) {
+            if (node == null)
+                return new NodeAVL(element);
+
+            if (element < node.value) {
+                node.left = insert(node.left, element);
+                node.left.parent = node;
+            } else {
+                node.right = insert(node.right, element);
+                node.right.parent = node;
+            }
+
+            updateHeight(node);
+
+            int balance = getBalance(node);
+
+            if (balance > 1 && element < node.left.value)
+                return rotateRight(node);
+
+            if (balance < -1 && element > node.right.value)
+                return rotateLeft(node);
+
+            if (balance > 1 && element > node.left.value) {
+                node.left = rotateLeft(node.left);
+                return rotateRight(node);
+            }
+
+            if (balance < -1 && element < node.right.value) {
+                node.right = rotateRight(node.right);
+                return rotateLeft(node);
+            }
+
+            return node;
+        }
+
+        private void updateHeight(NodeAVL node) {
+            node.height = 1 + Math.max(height(node.left), height(node.right));
+        }
+
+        private int height(NodeAVL node) {
+            if (node == null) {
+                return -1;
+            }
+            return node.height;
+        }
+
+        public int getBalance(NodeAVL node){
+            if (node == null) return 0;
+            return height(node.left) - height(node.right);
+        }
+
+
+        private NodeAVL rotateRight(NodeAVL y) {
+            NodeAVL x = y.left;
+            NodeAVL z = x.right;
+
+            x.right = y;
+            y.left = z;
+
+            if (z != null) z.parent = y;
+
+            x.parent = y.parent;
+            y.parent = x;
+
+            updateHeight(y);
+            updateHeight(x);
+
+            return x;
+        }
+
+        private NodeAVL rotateLeft(NodeAVL x) {
+            NodeAVL y = x.right;
+            NodeAVL z = y.left;
+
+            y.left = x;
+            x.right = z;
+
+            if (z != null) z.parent = x;
+
+            y.parent = x.parent;
+            x.parent = y;
+
+            updateHeight(x);
+            updateHeight(y);
+
+            return y;
+        }
     
     /**
      * Implementação iterativa da adição de um elemento em uma árvore binária de pequisa.
